@@ -15,20 +15,23 @@
    antique gold (the hallmark) + one velvet tone per product line
    ============================================================ */
 :root{
-  --wine:#4A0E1E;
-  --wine-deep:#2E0713;
-  --gold:#C6A15B;
-  --gold-soft:#E3CB99;
-  --ivory:#FAF6EF;
-  --sand:#F0E7DA;
-  --ink:#241318;
-  --muted:#7A6A63;
-  --line:#E2D6C6;
+  /* Midnight & Champagne — set as the live default. See THEMES in the
+     script for the other two palettes; the values below must match
+     THEMES.sapphire.vars exactly so first paint isn't wine before JS runs. */
+  --wine:#152A4C;
+  --wine-deep:#081527;
+  --gold:#C8B58C;
+  --gold-soft:#E7DCC4;
+  --ivory:#F7F5F0;
+  --sand:#E9E5DC;
+  --ink:#161C26;
+  --muted:#71767F;
+  --line:#DCD8CE;
 
   /* velvet per line — the tray each piece is laid on */
-  --velvet-ethnic:#5A1024;
-  --velvet-ad:#152647;
-  --velvet-western:#2C3A38;
+  --velvet-ethnic:#3A1330;
+  --velvet-ad:#102244;
+  --velvet-western:#28313C;
 
   --r:2px;
   --shadow:0 1px 2px rgba(46,7,19,.05), 0 8px 24px -12px rgba(46,7,19,.18);
@@ -372,7 +375,11 @@ footer a:hover{color:var(--gold-soft)}
 <div class="scrim" id="scrim" onclick="closeAll()"></div>
 <aside class="panel" id="cartPanel" aria-label="Your bag"></aside>
 <aside class="panel" id="studioPanel" aria-label="Product photos"></aside>
+<!-- Palette/theme switcher — disabled, default (midnight) theme only for now.
+     To restore: uncomment this div, uncomment the palettes route below in
+     router(), and uncomment the renderDevbar() call in router().
 <div class="devbar" id="devbar"></div>
+-->
 
 <script>
 /* ============================================================
@@ -467,7 +474,7 @@ const THEMES = {
     vars:{"wine":"#152A4C","wine-deep":"#081527","gold":"#C8B58C","gold-soft":"#E7DCC4","ivory":"#F7F5F0","sand":"#E9E5DC","ink":"#161C26","muted":"#71767F","line":"#DCD8CE",
           "velvet-ethnic":"#3A1330","velvet-ad":"#102244","velvet-western":"#28313C"}}
 };
-let THEME = "wine";
+let THEME = "sapphire";
 function applyTheme(k){
   THEME = k;
   suppressScroll = true;
@@ -1161,14 +1168,14 @@ function router(){
     app.innerHTML = aboutPage();
   } else if(seg[0] === "care"){
     app.innerHTML = carePage();
-  } else if(seg[0] === "palettes"){
+  } /* else if(seg[0] === "palettes"){
     app.innerHTML = palettesPage();
-  } else if(seg[0] === "visit"){
+  } */ else if(seg[0] === "visit"){
     app.innerHTML = visitPage();
   } else {
     app.innerHTML = homePage();
   }
-  renderDevbar();
+  // renderDevbar(); // Palette switcher disabled — default theme only. Uncomment to restore.
   if(FEATURES.cart) renderCart();
   if(!suppressScroll) window.scrollTo(0,0);
   suppressScroll = false;

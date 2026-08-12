@@ -226,8 +226,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .pdp{display:grid;gap:26px;padding-bottom:40px}
 @media(min-width:900px){.pdp{grid-template-columns:1.05fr .95fr;gap:52px;padding-bottom:70px}}
 .gallery .main{aspect-ratio:1/1;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff}
-.thumbs{display:flex;gap:9px;margin-top:9px}
-.thumbs button{display:block;width:70px;aspect-ratio:1/1;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;padding:0}
+.thumbs{display:flex;gap:9px;margin-top:9px;overflow-x:auto;padding-bottom:4px}
+.thumbs::-webkit-scrollbar{height:3px}
+.thumbs::-webkit-scrollbar-thumb{background:var(--line)}
+.thumbs button{display:block;flex-shrink:0;width:70px;aspect-ratio:1/1;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;padding:0}
 .thumbs button.on{border-color:var(--wine);border-width:2px}
 .pdp-info h1{font-size:clamp(25px,5.4vw,36px);margin:8px 0 10px}
 .pdp-price{font-size:25px;font-weight:600;display:flex;align-items:baseline;gap:11px;margin-bottom:6px}

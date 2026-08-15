@@ -652,11 +652,13 @@ function homePage(){
     <div class="trays">
       ${Object.entries(LINES).map(([k,l])=>{
         const sample = PRODUCTS.find(p=>p.line===k);
+        const counterImages = {ethnic:"images/counter-ethnic.jpg", ad:"images/counter-ad.jpg", western:"images/counter-western.jpg"};
+        const img = counterImages[k];
         return `<a class="tray ${l.velvet}" href="#/shop/${k}">
           <span class="num">Counter ${k==='ethnic'?'01':k==='ad'?'02':'03'}</span>
           <h3>${l.full}</h3>
           <p>${l.blurb}</p>
-          <div class="art" style="height:150px">${art(sample,2)}</div>
+          <div class="art" style="height:150px"><img src="${img}" alt="${l.full}" style="width:100%;height:100%;object-fit:cover"></div>
           <span class="go">Open this tray →</span>
         </a>`;
       }).join("")}

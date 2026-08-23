@@ -1,0 +1,32 @@
+{
+  "exported_at": "2026-08-23T10:48:28.345Z",
+  "pieces": [
+    {
+      "id": "nz-000002",
+      "type": "earrings",
+      "price": "2000.00",
+      "weight": "25.000",
+      "size": "7.5 centimeter",
+      "mrp": "2200.00",
+      "badge": "bestseller",
+      "notes": "",
+      "images": [
+        {
+          "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185593-zcJvEmsuCKHHngdJCS9ObldIBFMZKb.jpg"
+        },
+        {
+          "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185594-WCtEPXhB8a7KvPT30nfDVMDKaSo7Xy.jpg"
+        },
+        {
+          "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185587-harmLBI49nRbP9Fhdct4GxtinB1XfP.jpg"
+        },
+        {
+          "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185591-EQWc6JIapi7VyUJEPX5o0sTWGiIlni.jpg"
+        },
+        {
+          "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185595-GypOQ0rbl5OM8m1iBBxVVLy7y7leWk.jpg"
+        }
+      ]
+    }
+  ]
+}

@@ -169,7 +169,9 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .art-wrap{width:100%;height:100%;display:block;transition:.5s var(--ease)}
 .badge{position:absolute;left:10px;top:10px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
   padding:5px 9px;background:var(--ivory);color:var(--wine);font-weight:700;border-radius:var(--r)}
-.badge.new{background:var(--gold);color:var(--wine-deep)}
+.badge.b-gold{background:var(--gold);color:var(--wine-deep)}
+.badge.b-quiet{}
+.badge.b-strong{background:var(--wine-deep);color:var(--gold-soft)}
 .card .body{padding:13px 13px 15px;display:flex;flex-direction:column;gap:5px;flex:1}
 .card .line-tag{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .card h3{font-size:15px;line-height:1.32}
@@ -420,11 +422,23 @@ const LINES = {
 
 const TYPES = {
   "necklace-set":"Necklace sets", "necklace":"Necklaces", "earrings":"Earrings",
-  "bangles":"Bangles & kadas", "bracelets":"Bracelets", "rings":"Rings",
+  "bangles":"Bangles", "kada":"Kadas", "bracelets":"Bracelets", "rings":"Rings",
   "maang-tikka":"Maang tikka", "anklets":"Anklets"
 };
 
 const OCCASIONS = {everyday:"Everyday", office:"Office", festive:"Festive", party:"Party & cocktail", bridal:"Bridal"};
+
+/* Badges are a controlled vocabulary — any other string on a product
+   silently renders no badge. "" (no badge) is always valid, and a
+   piece carries at most one. */
+const BADGES = {
+  "bestseller":         {label:"Bestseller",         tone:"quiet"},
+  "new":                {label:"New",                tone:"gold"},
+  "few-left":           {label:"Few left",           tone:"strong"},
+  "back-in-stock":      {label:"Back in stock",      tone:"gold"},
+  "customer-favourite": {label:"Customer favourite", tone:"quiet"},
+  "handcrafted":        {label:"Handcrafted",        tone:"quiet"}
+};
 
 const BANDS = [
   {id:"b1", label:"Under ₹500",       min:0,    max:499},
@@ -468,6 +482,7 @@ function art(p, view, theme){
   const P = pal(theme);
   const bg = P["velvet-"+p.line] || P["velvet-ethnic"];
   const g = P.gold, gs = P["gold-soft"];
+  const drawKey = p.type === "kada" ? "bangles" : p.type;
   const draw = {
     "necklace-set": `<path d="M60 62 Q150 168 240 62" fill="none" stroke="${g}" stroke-width="2.2"/>
       <path d="M78 64 Q150 148 222 64" fill="none" stroke="${g}" stroke-width="1.2" opacity=".7"/>
@@ -507,7 +522,7 @@ function art(p, view, theme){
     "anklets": `<path d="M56 132 q94 84 188 0" fill="none" stroke="${g}" stroke-width="2.4"/>
       <g fill="${gs}">${[86,116,150,184,214].map((x,i)=>`<circle cx="${x}" cy="${168-Math.abs(150-x)/2.6}" r="4"/>`).join("")}</g>
       <path d="M56 132 a9 9 0 1 0 .1 0" fill="none" stroke="${g}" stroke-width="2"/>`
-  }[p.type] || "";
+  }[drawKey] || "";
 
   // three "views" = slight camera changes, so the gallery reads as a gallery
   const t = [ "translate(0,0) scale(1)", "translate(-46,-40) scale(1.32)", "translate(10,14) scale(.9) rotate(-8 150 150)" ][view];
@@ -535,7 +550,14 @@ function shotCount(p){ return (p.gallery && p.gallery.length) ? p.gallery.length
    ============================================================ */
 const rupee = n => "₹" + n.toLocaleString("en-IN");
 const byId  = id => PRODUCTS.find(p => p.id === id);
-const esc   = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc   = s => (s === null || s === undefined) ? "" : String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const has   = v => v !== null && v !== undefined && String(v).trim() !== "";
+
+/* A missing/unrecognised type or line falls back to the raw value
+   instead of throwing and blanking the grid. */
+const lineLabel = p => (LINES[p.line] || {}).label || p.line;
+const lineFull  = p => (LINES[p.line] || {}).full  || p.line;
+const typeLabel = p => TYPES[p.type] || p.type;
 
 function waLink(msg){ return `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(msg)}`; }
 function waProduct(p){
@@ -544,11 +566,12 @@ function waProduct(p){
 
 function card(p){
   const off = p.mrp > p.price ? `<s>${rupee(p.mrp)}</s>` : "";
-  const badge = p.badge ? `<span class="badge ${p.badge==='new'?'new':''}">${p.badge==='new'?'New':'Bestseller'}</span>` : "";
+  const b = BADGES[p.badge];
+  const badge = b ? `<span class="badge b-${b.tone}">${b.label}</span>` : "";
   return `<a class="card" href="#/piece/${p.id}">
     <div class="shot">${shot(p)}${badge}</div>
     <div class="body">
-      <span class="line-tag">${LINES[p.line].label} · ${TYPES[p.type]}</span>
+      <span class="line-tag">${lineLabel(p)} · ${typeLabel(p)}</span>
       <h3>${esc(p.name)}</h3>
       <span class="price">${rupee(p.price)}${off}</span>
     </div></a>`;
@@ -805,8 +828,21 @@ function piecePage(id){
   if(!p) return header("") + `<div class="wrap sec"><h1>That piece is no longer on the counter.</h1><p style="color:var(--muted);margin:12px 0 20px">It may have sold or been renamed.</p><a class="btn btn-wine" href="#/shop">Back to the counter</a></div>` + footer();
   const off = p.mrp>p.price ? `<s>${rupee(p.mrp)}</s><span class="off">${Math.round((1-p.price/p.mrp)*100)}% off</span>` : "";
   const related = PRODUCTS.filter(x=>x.id!==p.id && (x.line===p.line || x.type===p.type)).slice(0,4);
+  const specRows = [
+    ["Set includes", p.incl],
+    ["Stones", p.stones],
+    ["Finish", p.plating],
+    ["Size", p.size],
+    ["Weight", p.weight]
+  ].filter(([,v])=>has(v));
+  const descParts = [
+    has(p.incl) ? esc(p.incl) + "." : "",
+    has(p.stones) ? esc(p.stones) + (has(p.plating) ? "," : ".") : "",
+    has(p.plating) ? `finished in ${esc(String(p.plating).toLowerCase())}.` : "",
+    (p.occ && p.occ.length) ? `Suits ${p.occ.map(o=>(OCCASIONS[o]||o).toLowerCase()).join(", ")} wear.` : ""
+  ].filter(Boolean);
   return header("") + `
-  <div class="wrap crumbs"><a href="#/">Home</a> / <a href="#/shop/${p.line}">${LINES[p.line].full}</a> / <span>${esc(p.name)}</span></div>
+  <div class="wrap crumbs"><a href="#/">Home</a> / <a href="#/shop/${p.line}">${lineFull(p)}</a> / <span>${esc(p.name)}</span></div>
   <div class="wrap pdp">
     <div class="gallery">
       <div class="main" id="mainShot">${shot(p,0)}</div>
@@ -816,11 +852,11 @@ function piecePage(id){
       <p style="font-size:12px;color:var(--muted);margin-top:9px">${p.gallery&&p.gallery.length?"Your photographs.":"Front · detail · worn — swap in real photographs any time from the Photos panel."}</p>
     </div>
     <div class="pdp-info">
-      <span class="eyebrow">${LINES[p.line].full} · ${TYPES[p.type]}</span>
+      <span class="eyebrow">${lineFull(p)} · ${typeLabel(p)}</span>
       <h1>${esc(p.name)}</h1>
       <div class="pdp-price">${rupee(p.price)} ${off}</div>
       <p class="tax">Inclusive of all taxes · ${p.id}</p>
-      <p class="pdp-desc">${esc(p.incl)}. ${esc(p.stones)}, finished in ${esc(p.plating.toLowerCase())}. Suits ${p.occ.map(o=>OCCASIONS[o].toLowerCase()).join(", ")} wear.</p>
+      ${descParts.length ? `<p class="pdp-desc">${descParts.join(" ")}</p>` : ""}
       <div class="pdp-actions">
         ${FEATURES.cart
           ? `<button class="btn btn-wine" onclick="addToCart('${p.id}')">Add to bag</button>
@@ -828,13 +864,9 @@ function piecePage(id){
           : `<a class="btn btn-wa" href="${waProduct(p)}" target="_blank" rel="noopener">${WA_ICON} Enquire on WhatsApp</a>
              <a class="btn btn-outline" href="tel:${BRAND.phone.replace(/\s/g,'')}">Call the shop</a>`}
       </div>
-      <dl class="specs">
-        <div><dt>Set includes</dt><dd>${esc(p.incl)}</dd></div>
-        <div><dt>Stones</dt><dd>${esc(p.stones)}</dd></div>
-        <div><dt>Finish</dt><dd>${esc(p.plating)}</dd></div>
-        <div><dt>Size</dt><dd>${esc(p.size)}</dd></div>
-        <div><dt>Weight</dt><dd>${esc(p.weight)}</dd></div>
-      </dl>
+      ${specRows.length ? `<dl class="specs">
+        ${specRows.map(([label,v])=>`<div><dt>${label}</dt><dd>${esc(v)}</dd></div>`).join("")}
+      </dl>` : ""}
       <div class="assure"><span>Anti-tarnish pouch included</span><span>7-day exchange</span><span>Stone re-set free for 30 days</span></div>
       <div class="faq" style="margin-top:26px">
         <details><summary>How do I keep this piece looking new?</summary><div class="ans">Put it on last, after perfume and lotion have dried. Wipe it with a dry cloth after wearing, and store it in the pouch it came in. Full guide on the <a href="#/care" style="text-decoration:underline">care page</a>.</div></details>
@@ -845,7 +877,7 @@ function piecePage(id){
   </div>
 
   <div class="wrap sec-tight">
-    <div class="sec-head"><h2 style="font-size:24px">Wear it with</h2><a class="link" href="#/shop/${p.line}">More ${LINES[p.line].label.toLowerCase()}</a></div>
+    <div class="sec-head"><h2 style="font-size:24px">Wear it with</h2><a class="link" href="#/shop/${p.line}">More ${lineLabel(p).toLowerCase()}</a></div>
     <div class="rail">${related.map(card).join("")}</div>
   </div>
 
@@ -1067,7 +1099,7 @@ function renderCart(){
       <a class="th" href="#/piece/${p.id}" onclick="closeAll()">${shot(p,0)}</a>
       <div>
         <h4>${esc(p.name)}</h4>
-        <div class="meta">${LINES[p.line].label} · ${rupee(p.price)}</div>
+        <div class="meta">${lineLabel(p)} · ${rupee(p.price)}</div>
         <div><span class="qty"><button onclick="setQty('${p.id}',-1)" aria-label="One less">−</button><span>${i.qty}</span><button onclick="setQty('${p.id}',1)" aria-label="One more">+</button></span>
         <button class="rm" onclick="removeItem('${p.id}')">Remove</button></div>
       </div></div>`; }).join("");

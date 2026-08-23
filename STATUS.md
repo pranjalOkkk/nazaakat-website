@@ -26,14 +26,50 @@ Contact details, address, hours and palette hex values already live in code
   treat that as a manual check in the Vercel dashboard, not something a future
   session can verify by reading files.
 - Repo is public: `github.com/pranjalOkkk/nazaakat-website`.
-- No `package.json`, no `README.md`, no `node_modules` — the two `.mjs`
-  scripts (below) are run ad hoc with plain `node`, not part of the site's
-  runtime or build.
+- No `README.md`. The site itself (`index.html`) remains a plain static file
+  with no build step and no runtime dependencies — `fetch-images.mjs` and
+  `prepare-batch.mjs` are still run ad hoc with plain `node`, no install
+  needed. A `package.json` now exists, but scoped to dev/QA tooling only
+  (currently just `playwright`, for `check-wrap-padding.mjs` — see Changes);
+  `node_modules/` is gitignored and nothing under it is required to serve
+  or edit the site.
 
 ## Changes
 
 Most recent first.
 
+- **Fixed a `.wrap` padding-clobbering cascade bug, predating the taxonomy
+  work** (pending commit, this session). `.wrap{padding:0 20px}` is the
+  only source of side margins on any page where a section wraps `.wrap`
+  directly rather than nesting it inside a separate outer element — and on
+  every page except the homepage, a companion class (`sec`, `sec-tight`,
+  `shop-top`, `shop-body`, `crumbs`) sat on the *same* element as `wrap`
+  (e.g. `<div class="wrap shop-top">`) and used the `padding` **shorthand**
+  with equal CSS specificity, declared later in the stylesheet — so it won
+  the whole property and silently zeroed `.wrap`'s left/right, leaving
+  `#/shop`, `#/piece/:id`, `#/about`, `#/care` and `#/visit` flush to the
+  screen edge with no gutter. Confirmed via git diff that the exact CSS and
+  markup responsible is byte-identical across the initial commit
+  (`a1dc07a`), the pre-taxonomy commit (`98547ce`), and the commit right
+  before this fix — this bug shipped on day one, not something the six-line
+  re-cut or facet engine introduced. Fixed by converting those five rules
+  from the shorthand to `padding-top`/`padding-bottom` longhand (matching
+  the pattern `.pdp` already used correctly, since it only ever set
+  `padding-bottom`). A follow-up audit confirmed no other `wrap`-combined
+  element in the file was at risk (`mast-in`, `hero-in`, `split`, `story`
+  declare no `padding`/`margin` at all, so there's nothing for them to
+  clobber). **Why this survived every prior check**: every test in this
+  project (the vm/jsdom harnesses used throughout the taxonomy work) only
+  confirms a class *name* is present in rendered HTML — none of them run
+  real CSS cascade or layout, so none could see a later rule zero out an
+  earlier one. Added `check-wrap-padding.mjs` (headless Chromium via
+  Playwright, `npm install` once) as a **standing** check — not a one-off
+  diagnostic — asserting every `.wrap` element holds 20px horizontal
+  padding across all live routes at 390/768/900/1024/1280px; it's
+  selector-agnostic (queries every `.wrap` element rather than a hardcoded
+  list), so a future page combining `wrap` with a new companion class is
+  covered automatically. Run it after any prompt that touches `<style>` or
+  a page-render function, not only when a padding complaint resurfaces.
 - **Six-line re-cut, multi-category display, and a config-driven facet
   engine — plus the full new-facet vocabulary** (pending commit, this
   session). `nazaakat-taxonomy-spec.md` (repo root) is now the single
@@ -131,10 +167,13 @@ Most recent first.
   either flag is a one-line change with no other edit required. This was a
   deliberate deferral until catalogue size or order volume demands it, not a
   missing feature.
-- **No build step, no framework, no runtime dependencies.** Confirmed — no
-  `package.json` anywhere in the tree. `fetch-images.mjs` and
-  `prepare-batch.mjs` are standalone Node scripts run manually from the
-  shell for the photo-intake workflow; they don't touch the site itself.
+- **No build step, no framework, no runtime dependencies — for the site.**
+  `index.html` and `products.js` need nothing installed to serve or edit.
+  `fetch-images.mjs` and `prepare-batch.mjs` are standalone Node scripts run
+  manually from the shell for the photo-intake workflow; they don't touch
+  the site itself. `package.json` exists only for dev/QA tooling
+  (`check-wrap-padding.mjs`'s `playwright` dependency) and is never loaded
+  by the site.
 - **`:root` CSS and `THEMES.sapphire.vars` are duplicated on purpose and
   must be edited together.** So first paint isn't the wrong colour before JS
   runs. Confirmed currently identical — all 12 colour variables match
@@ -171,8 +210,26 @@ fetch-images.mjs     joins an intake-station export (SKU -> blob URLs) with
 prepare-batch.mjs    downloads every photo from an intake-station export
                      into ./batch/ (gitignored), named `<id>-01.jpg` etc. so
                      order survives being attached to a chat in any order.
-images/              committed product photos plus the three
-                     counter-{ethnic,ad,western}.jpg hero tiles;
+check-wrap-padding.mjs  headless-Chromium check that every `.wrap`-bearing
+                     element holds its 20px horizontal padding, across all
+                     live routes and five viewport widths (390–1280px).
+                     `npm install` alone provisions it (playwright's
+                     Chromium binary downloads via package.json's
+                     `postinstall` hook — confirmed by testing that this is
+                     needed: without it, `npm install` succeeds but the
+                     script then fails until a separate `npx playwright
+                     install chromium` is run). Not part of the site's
+                     runtime. Run after any prompt that touches <style> or
+                     a page-render function — see Changes for why a
+                     vm/jsdom check can't catch this class of bug.
+package.json         dev/QA tooling only (currently just `playwright`, for
+                     check-wrap-padding.mjs, with a `postinstall` hook that
+                     fetches its Chromium binary) — index.html loads
+                     nothing from it and needs no install of its own.
+images/              committed product photos plus the six
+                     counter-{kundan,temple,ad,oxidised,pearl,western}.jpg
+                     hero tiles (temple/oxidised/pearl not shot yet — the
+                     tray falls back to line-art, see LINES in index.html);
                      images/README.txt has the naming convention.
 exports/             paper trail from the photo-intake pipeline: the raw
                      intake-station export JSON plus matching
@@ -180,10 +237,10 @@ exports/             paper trail from the photo-intake pipeline: the raw
                      batch — this is the "entries.json" fetch-images.mjs
                      expects as its second argument.
 batch/               gitignored scratch output of prepare-batch.mjs.
-.gitignore           just `batch/`.
+.gitignore           `batch/` and `node_modules/`.
 ```
 
-No `README.md`, no `package.json`.
+No `README.md`.
 
 ## Open items — not yet built
 

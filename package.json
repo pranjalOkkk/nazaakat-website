@@ -1,0 +1,13 @@
+{
+  "name": "nazaakat-website-tooling",
+  "private": true,
+  "description": "Dev/QA tooling only — index.html itself remains a plain static file with no build step and no dependencies. This manifest exists solely so check-wrap-padding.mjs (and any future browser-based check) can be installed with a single `npm install`, which also provisions the Chromium binary via `postinstall` below — `npm install` alone does NOT do this for the playwright package by default, confirmed by testing; without this hook a fresh clone would need a second manual `npx playwright install chromium` step, which is exactly the kind of thing that gets forgotten.",
+  "type": "module",
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "check:padding": "node check-wrap-padding.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.0"
+  }
+}

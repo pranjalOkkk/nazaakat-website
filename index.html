@@ -146,8 +146,13 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .tray .go{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-soft);display:inline-flex;gap:7px;align-items:center}
 
 /* ---------- sections ---------- */
-.sec{padding:56px 0}
-.sec-tight{padding:40px 0}
+/* padding-top/-bottom, not the shorthand: several page functions put this
+   class directly on the same element as .wrap (e.g. <div class="wrap sec">).
+   The shorthand would win the whole `padding` property in the cascade
+   (equal specificity, declared later) and silently zero out .wrap's
+   left/right — .pdp already avoids this the same way. */
+.sec{padding-top:56px;padding-bottom:56px}
+.sec-tight{padding-top:40px;padding-bottom:40px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
 .sec-head h2{font-size:clamp(24px,5vw,34px)}
 .sec-head .link{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--line);padding-bottom:3px}
@@ -205,10 +210,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .trust p{font-size:13px;color:var(--muted)}
 
 /* ---------- shop page ---------- */
-.shop-top{padding:26px 0 18px;border-bottom:1px solid var(--line)}
+.shop-top{padding-top:26px;padding-bottom:18px;border-bottom:1px solid var(--line)}
 .shop-top h1{font-size:clamp(26px,6vw,40px);margin:8px 0 6px}
 .shop-top p{color:var(--muted);font-size:14px;max-width:60ch}
-.shop-body{display:grid;gap:26px;padding:22px 0 60px}
+.shop-body{display:grid;gap:26px;padding-top:22px;padding-bottom:60px}
 @media(min-width:900px){.shop-body{grid-template-columns:230px 1fr;gap:44px}}
 .filters{display:none}
 .filters.show{display:block}
@@ -230,7 +235,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .empty{border:1px dashed var(--line);padding:44px 20px;text-align:center;color:var(--muted);border-radius:var(--r)}
 
 /* ---------- product detail ---------- */
-.crumbs{font-size:12px;color:var(--muted);padding:16px 0}
+.crumbs{font-size:12px;color:var(--muted);padding-top:16px;padding-bottom:16px}
 .crumbs a:hover{color:var(--wine)}
 .pdp{display:grid;gap:26px;padding-bottom:40px}
 @media(min-width:900px){.pdp{grid-template-columns:1.05fr .95fr;gap:52px;padding-bottom:70px}}

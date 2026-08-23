@@ -1,0 +1,22 @@
+{
+  "exported_at": "2026-08-23T09:50:54.070Z",
+  "pieces": [
+    {
+      "id": "nz-000001",
+      "type": "earrings",
+      "price": "1500.00",
+      "weight": "20.000",
+      "size": "7.5 centimeter",
+      "mrp": "1800.00",
+      "badge": "new",
+      "notes": "Kundan work",
+      "images": [
+        { "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185595-NghU7UFIQjayzJzPqOxg3GmORSZp0B.jpg" },
+        { "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185594-uEzcbDcS196APKDgkfgLDk2L92dYAm.jpg" },
+        { "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185593-4ULOstCUK7pUqqFbdIXTAEaPwXSfwq.jpg" },
+        { "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185587-y3gZjaZzSB2KhoebIpGrYFHpaxkwzF.jpg" },
+        { "url": "https://0nq3sllinrv3ldzw.public.blob.vercel-storage.com/185591-40GUTpiT3T87HDYtWJ8RPK0uqtF3SI.jpg" }
+      ]
+    }
+  ]
+}

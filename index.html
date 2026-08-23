@@ -29,8 +29,11 @@
   --line:#DCD8CE;
 
   /* velvet per line — the tray each piece is laid on */
-  --velvet-ethnic:#3A1330;
+  --velvet-kundan:#3A1330;
+  --velvet-temple:#3E2814;
   --velvet-ad:#102244;
+  --velvet-oxidised:#1E2B27;
+  --velvet-pearl:#3B3430;
   --velvet-western:#28313C;
 
   --r:2px;
@@ -121,7 +124,6 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 /* the tray — three velvet panels, one per line */
 .trays{display:grid;gap:14px;margin-top:40px;padding-bottom:44px}
-@media(min-width:820px){.trays{grid-template-columns:repeat(3,1fr);gap:18px}}
 .tray{
   position:relative;border-radius:var(--r);padding:22px 20px 20px;color:var(--ivory);
   border:1px solid rgba(198,161,91,.28);overflow:hidden;display:block;
@@ -130,8 +132,11 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .tray:hover{transform:translateY(-3px);border-color:var(--gold)}
 .tray::before{content:"";position:absolute;inset:0;
   background:radial-gradient(85% 60% at 30% 0%, rgba(255,255,255,.16), transparent 65%);pointer-events:none}
-.v-ethnic{background:var(--velvet-ethnic)}
+.v-kundan{background:var(--velvet-kundan)}
+.v-temple{background:var(--velvet-temple)}
 .v-ad{background:var(--velvet-ad)}
+.v-oxidised{background:var(--velvet-oxidised)}
+.v-pearl{background:var(--velvet-pearl)}
 .v-western{background:var(--velvet-western)}
 .tray .num{font-size:10px;letter-spacing:.24em;color:var(--gold-soft);text-transform:uppercase}
 .tray h3{font-size:24px;margin:8px 0 6px}
@@ -150,7 +155,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 /* ---------- product card ---------- */
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:20px}}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:20px}.trays{grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:18px}}
 @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
 
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:64%;gap:14px;overflow-x:auto;
@@ -187,7 +192,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 /* ---------- story / trust ---------- */
 .split{display:grid;gap:26px;align-items:center}
 @media(min-width:860px){.split{grid-template-columns:1fr 1fr;gap:52px}}
-.story-shot{aspect-ratio:4/3;background:var(--velvet-ethnic);border-radius:var(--r);position:relative;overflow:hidden;display:grid;place-items:center;color:var(--gold-soft)}
+.story-shot{aspect-ratio:4/3;background:var(--velvet-kundan);border-radius:var(--r);position:relative;overflow:hidden;display:grid;place-items:center;color:var(--gold-soft)}
 .story-shot .cap{position:absolute;bottom:12px;left:12px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.72}
 .story h2{font-size:clamp(26px,5.4vw,38px);margin:12px 0 14px}
 .story p{color:var(--muted);margin-bottom:14px}
@@ -211,6 +216,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .fgroup:first-child{padding-top:0}
 .fgroup h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:11px;font-family:'Manrope',sans-serif}
 .fopt{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;cursor:pointer}
+.swatch-dot{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);flex-shrink:0}
 .fopt input{width:16px;height:16px;accent-color:var(--wine)}
 .fbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .fbar .count{font-size:13px;color:var(--muted)}
@@ -415,18 +421,99 @@ const BRAND = {
 /* Product lines. Each has its own velvet tone — that's how a shopper
    tells the three lines apart at a glance in a mixed grid.          */
 const LINES = {
-  ethnic:  {label:"Ethnic",           full:"Ethnic wear",      velvet:"v-ethnic",  blurb:"Kundan, meenakari, temple work and jhumkas — made for weddings, karwa chauth and the whole festive season."},
-  ad:      {label:"American Diamond", full:"American Diamond", velvet:"v-ad",      blurb:"CZ stones set in rhodium and gold tone. The sparkle of a diamond set, at a price you can own in four colours."},
-  western: {label:"Western",          full:"Western",          velvet:"v-western", blurb:"Hoops, bar pendants, stacked bangles and cocktail rings. Quiet enough for the office, sharp enough for dinner."}
+  kundan:   {label:"Traditional",       full:"Traditional & Kundan", velvet:"v-kundan",   blurb:"Kundan, polki and jadau — the sets that come out for weddings and stay in the family."},
+  temple:   {label:"Temple & Golden",   full:"Temple & Golden",      velvet:"v-temple",   blurb:"Temple motifs and plain gold-polish pieces. Antique or high-shine, no stones needed."},
+  ad:       {label:"American Diamond",  full:"American Diamond",    velvet:"v-ad",       blurb:"CZ set the way a diamond set would be — rhodium and gold tone, for receptions and cocktail evenings."},
+  oxidised: {label:"Oxidised",          full:"Oxidised",             velvet:"v-oxidised", blurb:"Blackened silver-tone with tribal and boho form. Cotton, linen, and everything a kurta goes with."},
+  pearl:    {label:"Pearl",             full:"Pearl",                velvet:"v-pearl",    blurb:"Shell and freshwater-look pearls, strung and set. The quietest counter in the shop."},
+  western:  {label:"Western",           full:"Western & Minimal",   velvet:"v-western",  blurb:"Hoops, bar pendants, stacking pieces. Quiet enough for the office, sharp enough for dinner."}
 };
 
+/* Ordered head-to-toe — also sidebar display order. choker/rani-haar/
+   pendant-set/collar/layered live under SUBTYPES, not here (they're to
+   necklace what jhumka is to earrings). passa, hair-accessory, anklets and
+   toe-rings are held back until stocked — a type key also has to be a
+   valid value in intake-station's dropdown and the catalog-entry skill, so
+   unlike other facets an unstocked type isn't shipped dark. */
 const TYPES = {
-  "necklace-set":"Necklace sets", "necklace":"Necklaces", "earrings":"Earrings",
-  "bangles":"Bangles", "kada":"Kadas", "bracelets":"Bracelets", "rings":"Rings",
-  "maang-tikka":"Maang tikka", "anklets":"Anklets"
+  "necklace-set":"Necklace sets", "necklace":"Necklaces", "mangalsutra":"Mangalsutra",
+  "earrings":"Earrings", "bangles":"Bangles", "kada":"Kadas", "bracelets":"Bracelets",
+  "rings":"Rings", "haath-phool":"Haath phool", "armlet":"Armlets / bajuband",
+  "maang-tikka":"Maang tikka", "matha-patti":"Matha patti", "nose-ring":"Nose rings & nath",
+  "kamarbandh":"Kamarbandh", "brooch":"Brooches & saree pins"
 };
 
-const OCCASIONS = {everyday:"Everyday", office:"Office", festive:"Festive", party:"Party & cocktail", bridal:"Bridal"};
+/* Subtypes are scoped to whichever parent types they apply to (`of`) and
+   only ever shown once one of those types is selected — see the "subtype"
+   entry in FACETS. */
+const SUBTYPES = {
+  "jhumka":     {label:"Jhumka",               of:["earrings"]},
+  "chandbali":  {label:"Chandbali",            of:["earrings"]},
+  "studs":      {label:"Studs & tops",         of:["earrings"]},
+  "hoops":      {label:"Hoops & bali",         of:["earrings"]},
+  "drops":      {label:"Drops & danglers",     of:["earrings"]},
+  "sui-dhaga":  {label:"Sui dhaga",            of:["earrings"]},
+  "ear-cuff":   {label:"Ear cuffs",            of:["earrings"]},
+  "sahara":     {label:"Kaan chain / sahara",  of:["earrings"]},
+  "choker":     {label:"Choker",               of:["necklace","necklace-set"]},
+  "rani-haar":  {label:"Rani haar / long",     of:["necklace","necklace-set"]},
+  "pendant-set":{label:"Pendant set",          of:["necklace","necklace-set"]},
+  "collar":     {label:"Collar",               of:["necklace","necklace-set"]},
+  "layered":    {label:"Layered & multi-strand", of:["necklace","necklace-set"]},
+  "cocktail":   {label:"Cocktail",             of:["rings"]},
+  "adjustable": {label:"Adjustable",           of:["rings"]},
+  "stackable":  {label:"Stackable",            of:["rings","bangles"]},
+  "openable":   {label:"Openable / hinged",    of:["bangles","kada","bracelets"]}
+};
+const subtypesFor = sel => Object.fromEntries(
+  Object.entries(SUBTYPES)
+    .filter(([,v]) => v.of.some(t => sel.includes(t)))
+    .map(([k,v]) => [k, v.label])
+);
+
+/* Craft and technique. Cuts across lines on purpose — meenakari appears in
+   Traditional, Temple & Golden and occasionally Western; the overlap with
+   `line` is hierarchical (the Traditional counter *contains* kundan work),
+   not redundant. */
+const STYLES = {
+  "kundan":"Kundan", "polki":"Polki", "jadau":"Jadau", "meenakari":"Meenakari",
+  "temple-work":"Temple work", "filigree":"Filigree", "cutwork":"Cutwork",
+  "mirror-work":"Mirror work", "navratna":"Navratna", "beadwork":"Beadwork",
+  "thread-lac":"Thread & lac", "stone-free":"Plain / stone-free"
+};
+
+/* The highest-value filter in this market — shoppers match a specific
+   saree or lehenga. Metal tones are included deliberately: "gold" and
+   "silver" are how a shopper describes a piece with no stones. */
+const COLOURS = {
+  "gold":"Gold", "silver":"Silver & rhodium", "rose-gold":"Rose gold",
+  "black":"Black & gunmetal", "white":"White & clear", "red":"Red & maroon",
+  "pink":"Pink & rose", "peach":"Peach & champagne", "green":"Green & emerald",
+  "blue":"Blue & navy", "purple":"Purple & wine", "multi":"Multicolour"
+};
+/* Sidebar swatch dot only — NOT theme tokens. A green stone is green in
+   all three palettes, so these stay out of :root and every THEMES object
+   rather than costing 36 more hex values for nothing. `multi` has no flat
+   hex; its dot renders as a conic-gradient instead (see fgroup()). */
+const COLOUR_HEX = {
+  gold:"#C9A227", silver:"#C6C8CA", "rose-gold":"#C98F7E", black:"#2B2B2E",
+  white:"#F2F0EA", red:"#9B1B30", pink:"#D4718F", peach:"#E3B899",
+  green:"#1F6B4E", blue:"#1E3E78", purple:"#5B2A5E"
+};
+
+/* Surface treatment — distinct from the `oxidised` line (what counter it
+   sits on) and the `stone-free` style (what it's made of). A two-tone
+   piece can be matte on one tone and high-shine on the other. */
+const FINISHES = {
+  "high-shine":"High shine", "matte":"Matte", "antique":"Antique",
+  "brushed":"Brushed & textured", "two-tone":"Two-tone & multi-tone"
+};
+
+const OCCASIONS = {
+  everyday:"Everyday", office:"Office", festive:"Festive", party:"Party & cocktail",
+  bridal:"Bridal", "wedding-guest":"Wedding guest", "haldi-mehendi":"Haldi & mehendi",
+  sangeet:"Sangeet & reception", gifting:"Gifting"
+};
 
 /* Badges are a controlled vocabulary — any other string on a product
    silently renders no badge. "" (no badge) is always valid, and a
@@ -444,8 +531,15 @@ const BANDS = [
   {id:"b1", label:"Under ₹500",       min:0,    max:499},
   {id:"b2", label:"₹500 – ₹1,000",    min:500,  max:1000},
   {id:"b3", label:"₹1,000 – ₹2,000",  min:1000, max:2000},
-  {id:"b4", label:"₹2,000 & above",   min:2000, max:1e9}
+  {id:"b4", label:"₹2,000 – ₹3,500",  min:2000, max:3500},
+  {id:"b5", label:"₹3,500 & above",   min:3500, max:1e9}
 ];
+
+/* Several copy strings spell out the line count in words ("Three
+   counters..."). Centralising it here means adding a seventh LINES
+   entry doesn't leave stale copy behind. */
+const COUNT_WORDS = {1:"One",2:"Two",3:"Three",4:"Four",5:"Five",6:"Six",7:"Seven"};
+const lineCountWord = () => COUNT_WORDS[Object.keys(LINES).length] || Object.keys(LINES).length;
 
 /* PRODUCTS — the catalogue now lives in products.js, loaded via
    <script src="products.js"> above this block. Edit that file to
@@ -460,13 +554,13 @@ const BANDS = [
 const THEMES = {
   wine: {label:"Wine & Gold", note:"Reads as a traditional Indian jewellery house. Warmest of the three, and the safest with kundan and meenakari photography.",
     vars:{"wine":"#4A0E1E","wine-deep":"#2E0713","gold":"#C6A15B","gold-soft":"#E3CB99","ivory":"#FAF6EF","sand":"#F0E7DA","ink":"#241318","muted":"#7A6A63","line":"#E2D6C6",
-          "velvet-ethnic":"#5A1024","velvet-ad":"#152647","velvet-western":"#2C3A38"}},
+          "velvet-kundan":"#5A1024","velvet-temple":"#4A2F12","velvet-ad":"#152647","velvet-oxidised":"#24322C","velvet-pearl":"#453A33","velvet-western":"#2C3A38"}},
   emerald:{label:"Emerald & Gold", note:"Cooler and more retail-modern. Green flatters gold-tone metal and makes the western line look less like an afterthought — but it fights green stones.",
     vars:{"wine":"#0F3B2C","wine-deep":"#082219","gold":"#C9A63F","gold-soft":"#E6D194","ivory":"#F8F6EF","sand":"#E9E7DB","ink":"#14231D","muted":"#6C7A72","line":"#DAD8CA",
-          "velvet-ethnic":"#123D2E","velvet-ad":"#10334A","velvet-western":"#2E3B31"}},
+          "velvet-kundan":"#123D2E","velvet-temple":"#3C2E13","velvet-ad":"#10334A","velvet-oxidised":"#1C2E26","velvet-pearl":"#37372E","velvet-western":"#2E3B31"}},
   sapphire:{label:"Midnight & Champagne", note:"The most premium-feeling and the least ethnic. Makes American Diamond sparkle read as real — at the cost of some festive warmth.",
     vars:{"wine":"#152A4C","wine-deep":"#081527","gold":"#C8B58C","gold-soft":"#E7DCC4","ivory":"#F7F5F0","sand":"#E9E5DC","ink":"#161C26","muted":"#71767F","line":"#DCD8CE",
-          "velvet-ethnic":"#3A1330","velvet-ad":"#102244","velvet-western":"#28313C"}}
+          "velvet-kundan":"#3A1330","velvet-temple":"#3E2814","velvet-ad":"#102244","velvet-oxidised":"#1E2B27","velvet-pearl":"#3B3430","velvet-western":"#28313C"}}
 };
 let THEME = "sapphire";
 function applyTheme(k){
@@ -477,12 +571,28 @@ function applyTheme(k){
 }
 const pal = k => THEMES[k||THEME].vars;
 
+/* The `draw` map below has hand-drawn line art for eight shapes. Everything
+   else resolves through this alias to the shape it most resembles. Keys
+   here are TYPES keys; values are drawing names, not types themselves —
+   `anklets` in particular is kept in `draw` purely as kamarbandh's alias
+   target, even though `anklets` was removed as a product type. */
+const ART_ALIAS = {
+  "kada":"bangles",        "armlet":"bangles",
+  "mangalsutra":"necklace","haath-phool":"bracelets",
+  "matha-patti":"maang-tikka", "brooch":"maang-tikka",
+  "nose-ring":"rings",     "kamarbandh":"anklets"
+};
+
 function art(p, view, theme){
   view = view || 0;
   const P = pal(theme);
-  const bg = P["velvet-"+p.line] || P["velvet-ethnic"];
+  // Silent fallback by design: an unrecognised p.line (e.g. retired test data)
+  // still needs a velvet tone to paint, so it borrows western's rather than throwing.
+  const bg = P["velvet-"+p.line] || P["velvet-western"];
   const g = P.gold, gs = P["gold-soft"];
-  const drawKey = p.type === "kada" ? "bangles" : p.type;
+  const drawKey = ART_ALIAS[p.type] || p.type;
+  // Generic fallback so a future, unmapped type never renders a blank rectangle.
+  const genericDraw = `<g fill="none" stroke="${g}" stroke-width="2"><path d="M150 88 l42 62 -42 62 -42-62z"/><circle cx="150" cy="150" r="15" fill="none" stroke="${gs}" stroke-width="2"/></g>`;
   const draw = {
     "necklace-set": `<path d="M60 62 Q150 168 240 62" fill="none" stroke="${g}" stroke-width="2.2"/>
       <path d="M78 64 Q150 148 222 64" fill="none" stroke="${g}" stroke-width="1.2" opacity=".7"/>
@@ -522,7 +632,7 @@ function art(p, view, theme){
     "anklets": `<path d="M56 132 q94 84 188 0" fill="none" stroke="${g}" stroke-width="2.4"/>
       <g fill="${gs}">${[86,116,150,184,214].map((x,i)=>`<circle cx="${x}" cy="${168-Math.abs(150-x)/2.6}" r="4"/>`).join("")}</g>
       <path d="M56 132 a9 9 0 1 0 .1 0" fill="none" stroke="${g}" stroke-width="2"/>`
-  }[drawKey] || "";
+  }[drawKey] || genericDraw;
 
   // three "views" = slight camera changes, so the gallery reads as a gallery
   const t = [ "translate(0,0) scale(1)", "translate(-46,-40) scale(1.32)", "translate(10,14) scale(.9) rotate(-8 150 150)" ][view];
@@ -559,6 +669,22 @@ const lineLabel = p => (LINES[p.line] || {}).label || p.line;
 const lineFull  = p => (LINES[p.line] || {}).full  || p.line;
 const typeLabel = p => TYPES[p.type] || p.type;
 
+/* Multi-category: a piece has one canonical line/type for display (velvet
+   colour, breadcrumb, card label) plus optional secondaries that only widen
+   what it matches in the filters. */
+const linesOf = p => [p.line, ...(p.alsoLines || [])];
+const typesOf = p => [p.type,  ...(p.alsoTypes  || [])];
+
+/* Load-time guardrail: flags catalogue authoring mistakes in the console
+   only — never alert(), never anything a shopper sees. */
+PRODUCTS.forEach(p => {
+  const al = p.alsoLines || [], at = p.alsoTypes || [];
+  if(al.length > 1) console.warn(`${p.id}: alsoLines has more than one secondary line`, al);
+  if(at.length > 1) console.warn(`${p.id}: alsoTypes has more than one secondary type`, at);
+  if(al.includes(p.line)) console.warn(`${p.id}: alsoLines repeats the primary line "${p.line}"`);
+  if(at.includes(p.type)) console.warn(`${p.id}: alsoTypes repeats the primary type "${p.type}"`);
+});
+
 function waLink(msg){ return `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(msg)}`; }
 function waProduct(p){
   return waLink(`Hello Nazaakat, I'd like to know more about ${p.name} (${p.id}) — ${rupee(p.price)}. Is it in stock?`);
@@ -583,7 +709,7 @@ const WA_ICON = `<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s
    4. shared chrome
    ============================================================ */
 function header(active){
-  const nav = [["#/shop/ethnic","Ethnic"],["#/shop/ad","American Diamond"],["#/shop/western","Western"],["#/care","Care & FAQ"],["#/about","Our story"],["#/visit","Visit"]];
+  const nav = [["#/shop","Shop"],["#/care","Care & FAQ"],["#/about","Our story"],["#/visit","Visit"]];
   return `<header class="masthead"><div class="wrap mast-in">
     <a class="brand" href="#/">
       <span class="small">Naveen Jewellers'</span>
@@ -599,12 +725,10 @@ function header(active){
   <div class="drawer" id="drawer">
     <button class="close" aria-label="Close menu" onclick="this.parentElement.classList.remove('open')">×</button>
     <h4>Shop by line</h4>
-    <a href="#/shop/ethnic" onclick="closeDrawer()">Ethnic wear</a>
-    <a href="#/shop/ad" onclick="closeDrawer()">American Diamond</a>
-    <a href="#/shop/western" onclick="closeDrawer()">Western</a>
+    ${Object.entries(LINES).map(([k,l])=>`<a href="#/shop/${k}" onclick="closeDrawer()">${l.full}</a>`).join("")}
     <a href="#/shop" onclick="closeDrawer()">Everything</a>
     <h4>Shop by type</h4>
-    ${Object.entries(TYPES).map(([k,v])=>`<a href="#/shop?type=${k}" onclick="closeDrawer()">${v}</a>`).join("")}
+    ${liveTypeEntries().map(([k,v])=>`<a href="#/shop?type=${k}" onclick="closeDrawer()">${v}</a>`).join("")}
     <h4>More</h4>
     <a href="#/care" onclick="closeDrawer()">Care &amp; FAQ</a>
     <a href="#/about" onclick="closeDrawer()">Our story</a>
@@ -621,7 +745,7 @@ function footer(){
         <p>Naveen Jewellers' fashion jewellery counter — western, American Diamond and ethnic pieces, hand-checked before they leave the shop.</p>
       </div>
       <div><h4>Shop</h4>
-        <a href="#/shop/ethnic">Ethnic wear</a><a href="#/shop/ad">American Diamond</a><a href="#/shop/western">Western</a><a href="#/shop?sort=new">New arrivals</a></div>
+        ${Object.entries(LINES).map(([k,l])=>`<a href="#/shop/${k}">${l.full}</a>`).join("")}<a href="#/shop?sort=new">New arrivals</a></div>
       <div><h4>Help</h4>
         <a href="#/care">Care guide</a><a href="#/care">FAQ &amp; exchange</a><a href="#/visit">Visit the shop</a><a href="${waLink('Hello Nazaakat, I have a question.')}" target="_blank" rel="noopener">WhatsApp us</a></div>
       <div><h4>Reach us</h4>
@@ -643,22 +767,19 @@ function homePage(){
   return header("#/") + `
   <section class="hero"><div class="wrap hero-in">
     <span class="eyebrow on-dark">Naveen Jewellers · since ${BRAND.since}</span>
-    <h1>Three counters,<br>one <em>nazaakat</em>.</h1>
+    <h1>${lineCountWord()} counters,<br>one <em>nazaakat</em>.</h1>
     <p class="lede">Nazaakat means finesse — the small difference between jewellery that looks bought and jewellery that looks chosen. Browse the counter, then message us to hold a piece.</p>
     <div class="hero-actions">
       <a class="btn btn-gold" href="#/shop">See the full counter</a>
       <a class="btn btn-ghost" href="${waLink('Hello Nazaakat, I am looking for something specific.')}" target="_blank" rel="noopener">Tell us what you need</a>
     </div>
     <div class="trays">
-      ${Object.entries(LINES).map(([k,l])=>{
-        const sample = PRODUCTS.find(p=>p.line===k);
-        const counterImages = {ethnic:"images/counter-ethnic.jpg", ad:"images/counter-ad.jpg", western:"images/counter-western.jpg"};
-        const img = counterImages[k];
+      ${Object.entries(LINES).map(([k,l],i)=>{
         return `<a class="tray ${l.velvet}" href="#/shop/${k}">
-          <span class="num">Counter ${k==='ethnic'?'01':k==='ad'?'02':'03'}</span>
+          <span class="num">Counter ${String(i+1).padStart(2,"0")}</span>
           <h3>${l.full}</h3>
           <p>${l.blurb}</p>
-          <div class="art" style="height:150px"><img src="${img}" alt="${l.full}" style="width:100%;height:100%;object-fit:cover"></div>
+          <div class="art" style="height:150px"><img src="images/counter-${k}.jpg" alt="${l.full}" style="width:100%;height:100%;object-fit:cover" onerror="this.remove()"></div>
           <span class="go">Open this tray →</span>
         </a>`;
       }).join("")}
@@ -674,7 +795,7 @@ function homePage(){
   <section class="sec-tight sec-sand"><div class="wrap">
     <span class="eyebrow">Looking for something particular?</span>
     <div class="pills" style="margin-top:14px">
-      ${Object.entries(TYPES).map(([k,v])=>`<a class="pill" href="#/shop?type=${k}">${v}</a>`).join("")}
+      ${liveTypeEntries().map(([k,v])=>`<a class="pill" href="#/shop?type=${k}">${v}</a>`).join("")}
     </div>
   </div></section>
 
@@ -686,7 +807,7 @@ function homePage(){
 
   <section class="sec sec-sand"><div class="wrap split story">
     <div class="story-shot">
-      <div style="width:62%;max-width:230px;height:80%">${art({id:'story',line:'ethnic',type:'necklace-set',name:'The shop'},0)}</div>
+      <div style="width:62%;max-width:230px;height:80%">${art({id:'story',line:'kundan',type:'necklace-set',name:'The shop'},0)}</div>
       <span class="cap">Replace with the storefront photo</span>
     </div>
     <div>
@@ -732,26 +853,75 @@ function homePage(){
 }
 
 /* ---------------- shop / listing ---------------- */
-let filterState = {line:[], type:[], band:[], occ:[], sort:"featured"};
+/* The facet engine. Sidebar, renderResults(), the chip row and syncBoxes()
+   all loop over this array — adding a facet is one entry here, nothing
+   else. `values()` returns either a {key:label} map or a {key:{full|label}}
+   map (see facetEntry below, which normalises both). `when()` lets a facet
+   hide itself entirely until some other selection makes it relevant (the
+   Detail/subtype group, until a type is picked). `swatch` flags a facet
+   whose options should carry a colour dot, with `hexFor(key)` supplying
+   the hex — a swatch value with no hex (just `multi`, today) falls back to
+   a conic-gradient dot rather than needing a special case. */
+const bandMap = () => Object.fromEntries(BANDS.map(b=>[b.id,b.label]));
+const inBand  = (p,v) => { const b = BANDS.find(x=>x.id===v); return b ? (p.price>=b.min && p.price<=b.max) : false; };
+
+const FACETS = [
+  // min:0 means all six Line values always render, even at zero stock —
+  // deliberate, to establish the six-counter structure ahead of stock.
+  // Changing to min:1 (hide empty lines) is a one-character edit.
+  {key:"line",    label:"Line",     values:()=>LINES,     match:(p,v)=>linesOf(p).includes(v),        min:0},
+  {key:"type",    label:"Type",     values:()=>TYPES,     match:(p,v)=>typesOf(p).includes(v),        min:3},
+  {key:"subtype", label:"Detail",   values:()=>subtypesFor(filterState.type),
+                                    match:(p,v)=>(p.subtypes||[]).includes(v),  min:1,
+                                    when:()=>filterState.type.length > 0},
+  {key:"style",   label:"Style",    values:()=>STYLES,    match:(p,v)=>(p.styles  ||[]).includes(v),  min:3},
+  {key:"colour",  label:"Colour",   values:()=>COLOURS,   match:(p,v)=>(p.colours ||[]).includes(v),  min:3, swatch:true, hexFor:v=>COLOUR_HEX[v]},
+  {key:"finish",  label:"Finish",   values:()=>FINISHES,  match:(p,v)=>(p.finishes||[]).includes(v),  min:3},
+  {key:"occ",     label:"Occasion", values:()=>OCCASIONS, match:(p,v)=>(p.occ     ||[]).includes(v),  min:2},
+  {key:"band",    label:"Price",    values:()=>bandMap(), match:(p,v)=>inBand(p,v),                   min:0}
+];
+
+const buildFilterState = () => ({...Object.fromEntries(FACETS.map(f=>[f.key,[]])), sort:"featured"});
+let filterState = buildFilterState();
+
+/* Counting logic shared by fgroup() (sidebar checkboxes) and any plain
+   link list that wants the same threshold (homepage pills, drawer "Shop by
+   type") — counts against ALL of PRODUCTS, per the governance rule below. */
+function liveFacetKeys(f){
+  return Object.keys(f.values()).filter(k => PRODUCTS.filter(p=>f.match(p,k)).length >= f.min);
+}
+const liveTypeEntries = () => liveFacetKeys(FACETS.find(f=>f.key==="type")).map(k=>[k, TYPES[k]]);
+
+/* Normalises a facet's values() map entry into {label, hex} — LINES
+   entries are objects (use .full), TYPES/OCCASIONS/bandMap entries are
+   plain strings. `hex` is undefined until a facet sets swatch:true and its
+   vocabulary carries one. */
+function facetEntry(f, k){
+  const raw = f.values()[k];
+  if(raw && typeof raw === "object") return {label: raw.full || raw.label || k, hex: raw.hex};
+  return {label: raw != null ? raw : k, hex: undefined};
+}
 
 function shopPage(lineKey, query){
-  filterState = {line: lineKey?[lineKey]:[], type:[], band:[], occ:[], sort:"featured"};
+  filterState = buildFilterState();
+  if(lineKey) filterState.line = [lineKey];
   if(query.get("type")) filterState.type = [query.get("type")];
   if(query.get("sort"))  filterState.sort = query.get("sort");
 
   const L = lineKey ? LINES[lineKey] : null;
+  const lineList = (() => {
+    const labels = Object.values(LINES).map(l=>l.label);
+    return labels.length > 1 ? labels.slice(0,-1).join(", ") + " and " + labels[labels.length-1] : labels.join("");
+  })();
   const html = header(lineKey?`#/shop/${lineKey}`:"#/shop") + `
   <div class="wrap shop-top">
     <span class="eyebrow">${L ? "Counter" : "Everything"}</span>
     <h1>${L ? L.full + " jewellery" : "The whole counter"}</h1>
-    <p>${L ? L.blurb : "Every piece across the three lines — western, American Diamond and ethnic. Filter it down, then message us about anything you like."}</p>
+    <p>${L ? L.blurb : `Every piece across the ${lineCountWord().toLowerCase()} lines — ${lineList}. Filter it down, then message us about anything you like.`}</p>
   </div>
   <div class="wrap shop-body">
     <aside class="filters" id="filters">
-      ${fgroup("Line", "line", Object.entries(LINES).map(([k,v])=>[k,v.full]))}
-      ${fgroup("Type", "type", Object.entries(TYPES))}
-      ${fgroup("Price", "band", BANDS.map(b=>[b.id,b.label]))}
-      ${fgroup("Occasion", "occ", Object.entries(OCCASIONS))}
+      ${FACETS.map(f=>fgroup(f)).join("")}
       <div class="fgroup"><button class="btn btn-outline btn-block" onclick="clearFilters()">Clear all filters</button></div>
     </aside>
     <div>
@@ -772,18 +942,50 @@ function shopPage(lineKey, query){
   return html;
 }
 
-function fgroup(title, key, opts){
-  return `<div class="fgroup"><h4>${title}</h4>
-    ${opts.map(([k,v])=>`<label class="fopt"><input type="checkbox" data-key="${key}" value="${k}" onchange="toggleFilter(this)"> ${v}</label>`).join("")}
+/* Governance rule: a value renders only once at least f.min live products
+   (counted against ALL of PRODUCTS, never the filtered list) match it, or
+   it's already active in filterState — so a deep link like
+   #/shop?type=kada never lands on an invisible, unclearable filter. A
+   facet with nothing surviving renders no heading at all. */
+function fgroup(f){
+  if(f.when && !f.when()) return "";
+  const active = filterState[f.key] || [];
+  const live = liveFacetKeys(f);
+  const keys = Object.keys(f.values()).filter(k => active.includes(k) || live.includes(k));
+  if(!keys.length) return "";
+  return `<div class="fgroup"><h4>${f.label}</h4>
+    ${keys.map(k=>{
+      const e = facetEntry(f,k);
+      const dot = f.swatch
+        ? `<i class="swatch-dot" style="background:${(f.hexFor && f.hexFor(k)) || "conic-gradient(#9B1B30,#C9A227,#1F6B4E,#1E3E78,#5B2A5E,#9B1B30)"}"></i>`
+        : "";
+      return `<label class="fopt${f.swatch?' has-swatch':''}"><input type="checkbox" data-key="${f.key}" value="${k}" onchange="toggleFilter(this)"> ${dot}${esc(e.label)}</label>`;
+    }).join("")}
   </div>`;
+}
+/* Any facet with a when() may depend on another facet's live selection
+   (Detail depends on Type). After any filterState change, drop selected
+   values that are no longer among that facet's current values() keys —
+   generic over FACETS, not hardcoded to "type"/"subtype" — so a
+   deselected type can't leave a subtype filter silently still applied. */
+function pruneOrphanedFacets(){
+  FACETS.forEach(f=>{
+    if(!f.when) return;
+    const valid = Object.keys(f.values());
+    filterState[f.key] = (filterState[f.key]||[]).filter(v=>valid.includes(v));
+  });
 }
 function toggleFilter(el){
   const k = el.dataset.key, v = el.value;
   filterState[k] = el.checked ? filterState[k].concat(v) : filterState[k].filter(x=>x!==v);
+  pruneOrphanedFacets();
   renderResults();
 }
 function clearFilters(){
-  filterState = {line:[],type:[],band:[],occ:[],sort:filterState.sort};
+  const sort = filterState.sort;
+  filterState = buildFilterState();
+  filterState.sort = sort;
+  pruneOrphanedFacets();
   document.querySelectorAll('.fopt input').forEach(i=>i.checked=false);
   renderResults();
 }
@@ -795,23 +997,20 @@ function syncBoxes(){
 }
 function renderResults(){
   let list = PRODUCTS.slice();
-  if(filterState.line.length) list = list.filter(p=>filterState.line.includes(p.line));
-  if(filterState.type.length) list = list.filter(p=>filterState.type.includes(p.type));
-  if(filterState.occ.length)  list = list.filter(p=>p.occ.some(o=>filterState.occ.includes(o)));
-  if(filterState.band.length){
-    const bands = BANDS.filter(b=>filterState.band.includes(b.id));
-    list = list.filter(p=>bands.some(b=>p.price>=b.min && p.price<=b.max));
-  }
+  FACETS.forEach(f=>{
+    if(f.when && !f.when()) return;
+    const sel = filterState[f.key];
+    if(sel && sel.length) list = list.filter(p=>sel.some(v=>f.match(p,v)));
+  });
   if(filterState.sort==="low")  list.sort((a,b)=>a.price-b.price);
   if(filterState.sort==="high") list.sort((a,b)=>b.price-a.price);
   if(filterState.sort==="new")  list.sort((a,b)=>(b.badge==="new")-(a.badge==="new"));
 
   document.getElementById("count").textContent = list.length + (list.length===1?" piece":" pieces");
   const chipDefs = [];
-  ["line","type","band","occ"].forEach(k=>{
-    (filterState[k]||[]).forEach(v=>{
-      const label = k==="line"?LINES[v].full : k==="type"?TYPES[v] : k==="band"?BANDS.find(b=>b.id===v).label : OCCASIONS[v];
-      chipDefs.push(`<span class="chip">${label}<button aria-label="Remove filter" onclick="removeChip('${k}','${v}')">×</button></span>`);
+  FACETS.forEach(f=>{
+    (filterState[f.key]||[]).forEach(v=>{
+      chipDefs.push(`<span class="chip">${esc(facetEntry(f,v).label)}<button aria-label="Remove filter" onclick="removeChip('${f.key}','${v}')">×</button></span>`);
     });
   });
   document.getElementById("chips").innerHTML = chipDefs.join("");
@@ -820,14 +1019,17 @@ function renderResults(){
     : `<div class="empty"><p style="margin-bottom:14px">Nothing on the counter matches that combination yet.</p>
        <button class="btn btn-outline" onclick="clearFilters()">Clear filters</button></div>`;
 }
-function removeChip(k,v){ filterState[k]=filterState[k].filter(x=>x!==v); syncBoxes(); renderResults(); }
+function removeChip(k,v){ filterState[k]=filterState[k].filter(x=>x!==v); pruneOrphanedFacets(); syncBoxes(); renderResults(); }
 
 /* ---------------- product detail ---------------- */
 function piecePage(id){
   const p = byId(id);
   if(!p) return header("") + `<div class="wrap sec"><h1>That piece is no longer on the counter.</h1><p style="color:var(--muted);margin:12px 0 20px">It may have sold or been renamed.</p><a class="btn btn-wine" href="#/shop">Back to the counter</a></div>` + footer();
   const off = p.mrp>p.price ? `<s>${rupee(p.mrp)}</s><span class="off">${Math.round((1-p.price/p.mrp)*100)}% off</span>` : "";
-  const related = PRODUCTS.filter(x=>x.id!==p.id && (x.line===p.line || x.type===p.type)).slice(0,4);
+  const related = PRODUCTS.filter(x => x.id !== p.id && (
+    linesOf(x).some(l => linesOf(p).includes(l)) ||
+    typesOf(x).some(t => typesOf(p).includes(t))
+  )).slice(0,4);
   const specRows = [
     ["Set includes", p.incl],
     ["Stones", p.stones],
@@ -908,11 +1110,19 @@ function aboutPage(){
     <p>That case kept outgrowing itself. Nazaakat is what it became.</p>
     <h2>What we actually sell</h2>
     <p>Everything here is fashion jewellery: brass and alloy bases, gold or rhodium plating, cubic zirconia and synthetic stones. It is not hallmarked gold and we never describe it as such. What it is, is well made — the settings hold, the plating is thick enough to survive a season of wear, and the finish is chosen to photograph like the real thing.</p>
-    <h3>Three lines, three kinds of evening</h3>
+    <h3>${lineCountWord()} lines, ${lineCountWord().toLowerCase()} kinds of evening</h3>
     <ul>
-      <li><strong>Ethnic</strong> — kundan, meenakari and temple work for weddings, festivals and the family functions in between.</li>
-      <li><strong>American Diamond</strong> — CZ stones set the way a diamond set would be, for receptions and cocktail evenings.</li>
-      <li><strong>Western</strong> — hoops, pendants and stacking pieces for work, and for days that do not need an occasion.</li>
+      ${(() => {
+        const clauses = {
+          kundan:   "kundan, polki and jadau for weddings, festivals and the family functions in between",
+          temple:   "temple motifs and plain gold-polish pieces, for pujas and occasions that ask for warmth without stones",
+          ad:       "CZ stones set the way a diamond set would be, for receptions and cocktail evenings",
+          oxidised: "blackened silver-tone with tribal and boho form, for daytime festivities and anything a kurta goes with",
+          pearl:    "shell and freshwater-look pearls, for the quietest evenings on the calendar",
+          western:  "hoops, pendants and stacking pieces for work, and for days that do not need an occasion"
+        };
+        return Object.entries(LINES).map(([k,l])=>`<li><strong>${l.label}</strong> — ${clauses[k] || l.blurb}.</li>`).join("");
+      })()}
     </ul>
     <h2>How we choose a piece</h2>
     <p>We buy in small quantities from workshops in Jaipur, Delhi and Rajkot, and we wear-test before we stock. A set that catches on a dupatta, or a hook that opens on its own, does not make it to the counter. Anything that arrives with a loose stone goes back.</p>
@@ -975,7 +1185,7 @@ function carePage(){
 
 /* ---------------- palette comparison ---------------- */
 function palettesPage(){
-  const sample = [PRODUCTS.find(p=>p.line==="ethnic"), PRODUCTS.find(p=>p.line==="ad")];
+  const sample = PRODUCTS.slice(0,2);
   return header("") + `
   <div class="page-head"><div class="wrap">
     <span class="eyebrow on-dark">Choose one</span>
@@ -989,7 +1199,7 @@ function palettesPage(){
       return `<div class="pal-col" style="${inline}">
         <div class="pal-hero">
           <span class="eyebrow on-dark">Naveen Jewellers'</span>
-          <div class="t">Three counters,<br>one <em>nazaakat</em>.</div>
+          <div class="t">${lineCountWord()} counters,<br>one <em>nazaakat</em>.</div>
           <p>Nazaakat means finesse — the difference between jewellery that looks bought and jewellery that looks chosen.</p>
         </div>
         <div class="pal-body">
@@ -1001,7 +1211,7 @@ function palettesPage(){
           <p class="pal-note">${t.note}</p>
           <div class="pal-mini">
             ${sample.map(sp=>`<div class="card"><div class="shot">${shot(sp,0,k)}</div>
-              <div class="body"><span class="line-tag">${LINES[sp.line].label}</span><h3>${esc(sp.name)}</h3>
+              <div class="body"><span class="line-tag">${lineLabel(sp)}</span><h3>${esc(sp.name)}</h3>
               <span class="price">${rupee(sp.price)}</span></div></div>`).join("")}
           </div>
           <button class="btn btn-wine btn-block" style="margin-top:14px" onclick="applyTheme('${k}')">${THEME===k?"Currently applied":"Apply "+t.label}</button>
@@ -1094,7 +1304,7 @@ function closeAll(){ document.querySelectorAll(".panel").forEach(x=>x.classList.
 
 function renderCart(){
   const el = document.getElementById("cartPanel");
-  const items = CART.map(i=>{ const p = byId(i.id); return `
+  const items = CART.map(i=>{ const p = byId(i.id); if(!p) return ""; return `
     <div class="citem">
       <a class="th" href="#/piece/${p.id}" onclick="closeAll()">${shot(p,0)}</a>
       <div>

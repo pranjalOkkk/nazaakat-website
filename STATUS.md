@@ -12,7 +12,7 @@ Contact details, address, hours and palette hex values already live in code
 
 ## Current state
 
-- Static, no-build site: `index.html` (1202 lines — markup, CSS and app JS in
+- Static, no-build site: `index.html` (~1400 lines — markup, CSS and app JS in
   one file) + `products.js` (the catalogue, a single `const PRODUCTS = [...]`,
   23 products). 5 products carry real photos (`nz-107`, `nz-108`, `nz-307`,
   `nz-000001`, `nz-000002`); the other 18 render generated SVG line-art on the
@@ -34,6 +34,50 @@ Contact details, address, hours and palette hex values already live in code
 
 Most recent first.
 
+- **Six-line re-cut, multi-category display, and a config-driven facet
+  engine — plus the full new-facet vocabulary** (pending commit, this
+  session). `nazaakat-taxonomy-spec.md` (repo root) is now the single
+  source of truth for all of this — shared with `intake-station` and the
+  `/nazaakat-catalog-entry` skill, neither of which has been updated yet
+  (see Open items). What changed:
+  - **Lines**: retired the three-line `ethnic`/`ad`/`western` taxonomy for
+    six — `kundan`, `temple`, `ad`, `oxidised`, `pearl`, `western` — each
+    with its own velvet tone across `:root` and all three `THEMES`
+    (confirmed byte-identical between `:root` and `THEMES.sapphire.vars`),
+    hero tray, drawer entry and footer entry, all derived from `LINES` so a
+    seventh line is a one-object edit (verified by temporarily adding one
+    and confirming it propagated everywhere with no other change).
+  - **Types**: widened from 9 to the spec's 15. `anklets` is **removed** as
+    a type but survives as the name of `art()`'s alias-drawing target for
+    `kamarbandh` — do not delete that drawing or re-add `anklets` to
+    `TYPES`. Added a generic fallback drawing so no type (present or
+    future) ever renders a blank velvet rectangle.
+  - **New facets**: `SUBTYPES` (17, scoped to parent types via an `of`
+    array, only shown once a type is selected), `STYLES` (12), `COLOURS`
+    (12, with a separate `COLOUR_HEX` swatch map — deliberately not theme
+    tokens, since a green stone is green in all three palettes), `FINISHES`
+    (5). `OCCASIONS` widened 5→9, `BANDS` widened 4→5 (ids held stable, so
+    an old `#/shop?band=b2` link still resolves the same band).
+  - **The facet engine**: the sidebar, `renderResults()`, the chip row,
+    `syncBoxes()` and `clearFilters()` no longer have per-facet code — they
+    all loop over one `FACETS` array (8 entries: line/type/subtype/style/
+    colour/finish/occ/band), each declaring its own `values()`, `match()`,
+    `min` render threshold, and optional `when()` (Detail/subtype only
+    shows once a type is picked) / `swatch` (Colour only) hooks. Confirmed
+    `renderResults()`/`syncBoxes()`/`toggleFilter()`/the chip loop contain
+    no hardcoded facet-key literals — adding a tenth throwaway facet during
+    verification was picked up everywhere with a one-line array edit.
+  - **Multi-category**: `linesOf()`/`typesOf()` plus optional `alsoLines`/
+    `alsoTypes` product fields (max one secondary each; a `console.warn`
+    -only load-time guardrail flags violations) let a piece match more than
+    one line/type filter while still showing exactly one canonical
+    line/type for display (velvet colour, breadcrumb, card label — the
+    velvet signature needs exactly one).
+  - `products.js`'s 23 products are untouched test data — still on the
+    retired `ethnic` line key and the old 5-occasion shape, carrying none
+    of the new `subtypes`/`styles`/`colours`/`finishes` fields. They still
+    render correctly (safe fallbacks: `lineLabel()`/`typeLabel()`/`art()`'s
+    velvet fallback), just don't populate any of the new filters.
 - **Kada split out as its own product type; missing-field and badge
   rendering hardened** (commit `98547ce`). `TYPES` now has `"kada"` as a
   sibling of `"bangles"` instead of folding them together — an
@@ -143,33 +187,26 @@ No `README.md`, no `package.json`.
 
 ## Open items — not yet built
 
-- **The golden line.** A fourth `LINES` entry for gold-polish, non-stone
-  jewellery (plain gold-tone pieces, sometimes with meenakari colour work,
-  no stones) — doesn't fit `ethnic` (defined by stone work) or `western`.
-  Touches `LINES`, a new `--velvet-golden` CSS var in `:root` **and** all
-  three `THEMES[*].vars` objects, `images/counter-golden.jpg`, the
-  hardcoded 3-column tray grid (`repeat(3,1fr)`), the hardcoded per-line
-  counter numbering and `counterImages` lookup in `homePage()`, and several
-  "three counters" / "three lines" strings scattered through copy (hero,
-  About page, footer, header nav). Raised, not implemented.
-- **Showing one product under more than one line/type.** `occ` is already
-  an array and filters with `.some()`; `line`/`type` are single strings
-  because the velvet-colour-per-line design needs one canonical line per
-  card. Proposed approach: optional `alsoLines`/`alsoTypes` arrays per
-  product plus `linesOf()`/`typesOf()` helpers that fold them in at filter
-  time, with a guardrail of one primary line plus at most one secondary.
-  Discussed, not implemented.
-- **Taxonomy expansion.** A competitor research pass (Bling Bag, Kushal's,
-  Priyaasi, Aachho, Shaya, Tarinika, Voylla) found the biggest gap is
-  missing *facets* — no colour filter, no material/finish filter — not
-  missing product types, though ~12 commonly-searched types are also absent
-  (mangalsutra, choker, rani haar, nose ring/nath, matha patti, etc.).
-  Recommends ~6 style-based lines instead of ethnic/ad/western, earring
-  sub-types as a secondary filter rather than top-level types, and a
-  governance rule of only surfacing a filter once it holds ≥3 live products.
-  The "add more badges" part of this research (few-left, back-in-stock,
-  customer-favourite, handcrafted) has already landed in code as `BADGES`
-  (see Changes above) — the rest is researched, not implemented.
+- **`intake-station` needs the same vocabulary.** It must gain the revised
+  15-value type list, the scoped subtype widget, and three new array
+  columns (`subtypes`, `colours`, `finishes`) — `nazaakat-taxonomy-spec.md`
+  §12 has the full capture-responsibility split. It does **not** need a
+  `line` column; line classification stays downstream, in the
+  catalog-entry skill, where the finished photo is.
+- **The `/nazaakat-catalog-entry` skill still knows none of this taxonomy**
+  and will not populate `line`, `alsoLines`, `styles`, `colours`,
+  `finishes` or `subtypes` from a photo batch until it is updated
+  separately from `nazaakat-taxonomy-spec.md` — same loose end as the
+  `BADGES` vocabulary noted below, now larger in scope.
+- **Collections are deliberately deferred** (spec §13) — festival edits,
+  gifting, "under ₹500" and similar. Tag-based collections go stale and
+  need seasonal curation; predicate-based ones should be computed, not
+  hand-tagged. Now that the facet engine exists, a collection is just a
+  saved `filterState` plus a title, so deferring costs little.
+- **`products.js` needs a real re-catalogue**, not just a line-key
+  backfill — the 23 test products predate every facet in this pass
+  (`subtypes`/`styles`/`colours`/`finishes`) and 21 of them predate
+  `alsoLines`/`alsoTypes` too. Not started.
 - **`nz-000001` and `nz-000002` share a name** ("Mint Kundan Chandbali")
   and near-identical `stones`/`size` text — different price, weight and
   photos, so presumably genuinely different pieces, but they'll read as

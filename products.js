@@ -4,6 +4,45 @@
    Add `img:"images/kundan-rani-haar.jpg"` to any item and the
    photo replaces the placeholder automatically. Or use `gallery`
    with an array of image paths for multiple photos.
+
+   Full field list (source of truth: nazaakat-taxonomy-spec.md §11):
+
+     id         "nz-000001"           required, opaque, unique
+     name       "Mint Kundan Chandbali" required
+     line       "kundan"              required, one of LINES
+     alsoLines  ["temple"]            optional, max one secondary
+     type       "earrings"            required, one of TYPES
+     alsoTypes  []                    optional, max one secondary
+     subtypes   ["chandbali"]         array, scoped to type — see SUBTYPES
+     styles     ["kundan","meenakari"] array — see STYLES
+     colours    ["gold","green"]      array — see COLOURS
+     finishes   ["high-shine"]        array — see FINISHES
+     occ        ["festive","party"]   array — see OCCASIONS
+     price      1500                  required, number
+     mrp        1800                  number, 0 = no strikethrough
+     badge      "new"                 one of BADGES, or ""
+     stones     "..."                 free text
+     plating    "..."                 free text
+     incl       "..."                 free text
+     size       "..."                 free text, may be null
+     weight     "20 g"                free text
+     gallery    ["images/a.jpg", ...] or img:"images/a.jpg" for one photo
+
+   `line`/`type` are the single canonical values used for display —
+   velvet colour, breadcrumb, card label — because a piece needs
+   exactly one of each for that. `alsoLines`/`alsoTypes` are optional
+   arrays that widen what the piece MATCHES in the shop filters
+   without changing how it displays, e.g. `alsoLines:["temple"]` on a
+   kundan piece makes it show up under both Traditional & Kundan and
+   Temple & Golden, but it still renders with the kundan velvet.
+   Guardrail (index.html, load time, console.warn only): at most one
+   secondary line and one secondary type, and neither may repeat the
+   primary value.
+
+   `subtypes`, `styles`, `colours` and `finishes` all default to `[]`
+   when omitted — a product missing any of them is valid, it simply
+   won't match those filters. None of the products below carry these
+   new fields yet; they're disposable test data, not backfilled.
    ------------------------------------------------------------ */
 const PRODUCTS = [
  {id:"nz-101", name:"Kundan Rani Haar Set",        line:"ethnic",  type:"necklace-set", price:3450, mrp:4600, occ:["bridal","festive"], badge:"bestseller", stones:"Uncut kundan with pearl drops", plating:"22k gold tone on brass", incl:"Long haar, short necklace, jhumkas, maang tikka", size:"Haar 42 cm · choker 36 cm, adjustable dori", weight:"185 g"},

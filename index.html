@@ -86,7 +86,17 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .btn-block{width:100%}
 
 /* ---------- header ---------- */
-.masthead{position:sticky;top:0;z-index:60;background:var(--ivory);border-bottom:1px solid var(--line)}
+/* position:fixed, not sticky — sticky silently fails to pin here because
+   both <html> and <body> set overflow-x:hidden (to stop horizontal
+   scroll/bounce), which in Chromium changes what "scroll container" a
+   sticky descendant sticks relative to and breaks it with no warning.
+   Fixed has no such ancestor-overflow failure mode. Fixed also removes
+   the header from document flow entirely (unlike sticky, which still
+   reserves its own space) — #app{padding-top} below compensates, sized to
+   .mast-in's height at each breakpoint so nothing renders underneath it. */
+.masthead{position:fixed;top:0;left:0;right:0;width:100%;z-index:60;background:var(--ivory);border-bottom:1px solid var(--line);transition:transform .25s ease}
+.masthead.mast-hide{transform:translateY(-100%)}
+#app{padding-top:67px} /* .mast-in's 66px + .masthead's own 1px border-bottom */
 .mast-in{display:flex;align-items:center;gap:16px;height:66px}
 .brand{display:flex;flex-direction:column;line-height:1;margin-right:auto}
 .brand .small{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -103,6 +113,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @media(min-width:900px){
   .nav{display:flex}.burger{display:none}.mast-cta{display:inline-flex}
   .mast-in{height:84px}
+  #app{padding-top:85px} /* .mast-in's 84px + .masthead's own 1px border-bottom */
 }
 
 /* mobile drawer */
@@ -1413,6 +1424,34 @@ function router(){
 let suppressScroll = false;
 window.addEventListener("hashchange", router);
 router();
+
+/* ---------- header hide-on-scroll-down / show-on-scroll-up ----------
+   Queries .masthead fresh on every scroll rather than caching a
+   reference, because router() replaces #app's entire innerHTML (and so
+   the header DOM node) on every navigation — a freshly-rendered header
+   never carries mast-hide, so a route change shows the header again with
+   no extra reset code needed here. */
+(function(){
+  const TOP_ZONE = 80;
+  const DOWN_DELTA = 8;
+  const UP_DELTA = 2;
+  let lastY = window.scrollY;
+  let ticking = false;
+  function onScroll(){
+    const y = window.scrollY;
+    const mast = document.querySelector(".masthead");
+    if(mast){
+      if(y <= TOP_ZONE) mast.classList.remove("mast-hide");
+      else if(y > lastY + DOWN_DELTA) mast.classList.add("mast-hide");
+      else if(y < lastY - UP_DELTA) mast.classList.remove("mast-hide");
+    }
+    lastY = y;
+    ticking = false;
+  }
+  window.addEventListener("scroll", () => {
+    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>

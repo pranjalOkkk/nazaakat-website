@@ -5,7 +5,7 @@
    photo replaces the placeholder automatically. Or use `gallery`
    with an array of image paths for multiple photos.
 
-   Full field list (source of truth: nazaakat-taxonomy-spec.md §11):
+   Full field list (source of truth: docs/nazaakat-taxonomy-spec.md §11):
 
      id         "nz-000001"           required, opaque, unique
      name       "Mint Kundan Chandbali" required

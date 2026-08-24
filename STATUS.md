@@ -72,7 +72,7 @@ Most recent first.
   a page-render function, not only when a padding complaint resurfaces.
 - **Six-line re-cut, multi-category display, and a config-driven facet
   engine — plus the full new-facet vocabulary** (pending commit, this
-  session). `nazaakat-taxonomy-spec.md` (repo root) is now the single
+  session). `docs/nazaakat-taxonomy-spec.md` is now the single
   source of truth for all of this — shared with `intake-station` and the
   `/nazaakat-catalog-entry` skill, neither of which has been updated yet
   (see Open items). What changed:
@@ -246,14 +246,14 @@ No `README.md`.
 
 - **`intake-station` needs the same vocabulary.** It must gain the revised
   15-value type list, the scoped subtype widget, and three new array
-  columns (`subtypes`, `colours`, `finishes`) — `nazaakat-taxonomy-spec.md`
+  columns (`subtypes`, `colours`, `finishes`) — `docs/nazaakat-taxonomy-spec.md`
   §12 has the full capture-responsibility split. It does **not** need a
   `line` column; line classification stays downstream, in the
   catalog-entry skill, where the finished photo is.
 - **The `/nazaakat-catalog-entry` skill still knows none of this taxonomy**
   and will not populate `line`, `alsoLines`, `styles`, `colours`,
   `finishes` or `subtypes` from a photo batch until it is updated
-  separately from `nazaakat-taxonomy-spec.md` — same loose end as the
+  separately from `docs/nazaakat-taxonomy-spec.md` — same loose end as the
   `BADGES` vocabulary noted below, now larger in scope.
 - **Collections are deliberately deferred** (spec §13) — festival edits,
   gifting, "under ₹500" and similar. Tag-based collections go stale and

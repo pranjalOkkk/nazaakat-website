@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 23 Aug 2026
+Last updated: 24 Aug 2026
 
 This file exists so a new chat, or a future you, can pick this project back up
 without re-deriving the reasoning behind it or re-pasting a handoff doc.
@@ -38,8 +38,60 @@ Contact details, address, hours and palette hex values already live in code
 
 Most recent first.
 
+- **Fixed broken `position:sticky` on both the masthead and the mobile PDP
+  buy bar; added hide-on-scroll to the masthead** (commits `4bbbeb4`,
+  `66777b9`). Both elements' `position:sticky` was silently non-functional
+  — confirmed in real Chromium, not assumed: `getComputedStyle` correctly
+  reported `"sticky"`, but `getBoundingClientRect()` moved in exact
+  lockstep with scroll instead of staying pinned, on both the header (top)
+  and the buy bar (bottom). Root cause: `overflow-x:hidden` on both
+  `<html>` and `<body>` (there to stop horizontal scroll/bounce) silently
+  changes what scroll container a `position:sticky` descendant sticks
+  relative to in Chromium and breaks it — no console warning, no dropped
+  CSS declaration to find by reading the stylesheet. Rebuilt both on
+  `position:fixed`, which has no such ancestor-overflow failure mode:
+  - `.masthead` → `position:fixed;top:0`, same `z-index`/background/
+    border. Fixed removes it from document flow (sticky still reserves
+    its own space even when not "stuck"), so `#app{padding-top}`
+    compensates — sized to the header's *actual* rendered height
+    including its own 1px `border-bottom` (67px mobile, 85px desktop),
+    not just `.mast-in`'s 66px/84px content height, which left a 1px
+    overlap when first tried and measured with the browser rather than
+    assumed. Added the hide-on-scroll-down/show-on-scroll-up behavior on
+    this now-solid foundation (`.mast-hide{transform:translateY(-100%)}`,
+    a passive rAF-throttled scroll listener with an 80px top zone and
+    asymmetric down/up thresholds). The listener queries `.masthead`
+    fresh on every scroll rather than caching a reference, because
+    `router()` replaces `#app`'s entire `innerHTML` — and so the header
+    DOM node — on every navigation; a freshly-rendered header never
+    carries `mast-hide`, so route changes reset visibility for free with
+    no extra code.
+  - `.sticky-buy` (the mobile product-page buy bar) → same fix, confirmed
+    independently rather than assumed just because the mechanism matched.
+    Its actual rendered height (69.8px, stable across every mobile width
+    and product tested, rounded up to 70px) is different from the
+    masthead's and was measured fresh rather than reused. `.pdp-page
+    footer{padding-bottom:70px}` compensates, reusing the `.pdp-page`
+    body class `router()` already sets (and `.wa-float`'s existing PDP
+    offset already consumes) rather than touching `footer()` on every
+    route; reset to 0 at the `>=900px` breakpoint where the bar itself
+    goes `display:none`.
+  - Verified in headless Chromium on both: fixed positioning holds at
+    every tested scroll depth; no route's content renders underneath the
+    header on load; the buy bar never overlaps the footer even scrolled
+    to the very end of the page; non-PDP routes and the desktop
+    breakpoint are unaffected; the mobile drawer opens above the header
+    with no z-index conflicts; the masthead's hide/show doesn't perturb
+    the page's total scroll height or the buy bar's independent pinning.
+  - `check-wrap-padding.mjs` and the facet-engine suite both re-run clean
+    against the final state — this work touched neither.
+- **`docs/nazaakat-taxonomy-spec.md` is now committed, not a temporary
+  chat artifact** (commit `6fb6c8e`). Every prompt before this one treated
+  the spec as something to read and delete; it's the shared source of
+  truth across this repo, `intake-station`, and the
+  `/nazaakat-catalog-entry` skill, and now has real version history.
 - **Fixed a `.wrap` padding-clobbering cascade bug, predating the taxonomy
-  work** (pending commit, this session). `.wrap{padding:0 20px}` is the
+  work** (commit `43fa174`). `.wrap{padding:0 20px}` is the
   only source of side margins on any page where a section wraps `.wrap`
   directly rather than nesting it inside a separate outer element — and on
   every page except the homepage, a companion class (`sec`, `sec-tight`,
@@ -71,8 +123,8 @@ Most recent first.
   covered automatically. Run it after any prompt that touches `<style>` or
   a page-render function, not only when a padding complaint resurfaces.
 - **Six-line re-cut, multi-category display, and a config-driven facet
-  engine — plus the full new-facet vocabulary** (pending commit, this
-  session). `docs/nazaakat-taxonomy-spec.md` is now the single
+  engine — plus the full new-facet vocabulary** (commit `5599b58`, tray
+  line-art follow-up `0360ad2`). `docs/nazaakat-taxonomy-spec.md` is now the single
   source of truth for all of this — shared with `intake-station` and the
   `/nazaakat-catalog-entry` skill, neither of which has been updated yet
   (see Open items). What changed:
@@ -194,7 +246,7 @@ Most recent first.
 ## File map (for quick orientation)
 
 ```
-index.html          1202 lines — markup, CSS and app JS. Internal numbered
+index.html          ~1460 lines — markup, CSS and app JS. Internal numbered
                      comment banners (1. SHOP CONFIG through 9. router) mark
                      section boundaries; SHOP CONFIG is the "edit here,
                      nothing else" zone for FEATURES/BRAND/LINES/TYPES/
@@ -226,6 +278,11 @@ package.json         dev/QA tooling only (currently just `playwright`, for
                      check-wrap-padding.mjs, with a `postinstall` hook that
                      fetches its Chromium binary) — index.html loads
                      nothing from it and needs no install of its own.
+docs/                docs/nazaakat-taxonomy-spec.md — the finalized line/
+                     type/subtype/style/colour/finish/occasion/price-band
+                     vocabulary, shared source of truth with
+                     `intake-station` and the `/nazaakat-catalog-entry`
+                     skill (neither has been updated to match yet).
 images/              committed product photos plus the six
                      counter-{kundan,temple,ad,oxidised,pearl,western}.jpg
                      hero tiles (temple/oxidised/pearl not shot yet — the

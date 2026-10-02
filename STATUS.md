@@ -38,6 +38,47 @@ Contact details, address, hours and palette hex values already live in code
 
 Most recent first.
 
+- **Added `check-facet-engine.mjs` — the permanent facet-engine check.**
+  **No such committed check existed before this**, even though many earlier
+  prompts and STATUS lines referred to "the existing facet-engine suite" as
+  if it did: each past session wrote a throwaway vm/jsdom script, ran it
+  once and discarded it (not in this repo, its git history, or
+  `../intake-station`). So "0 failures" in earlier entries was real but a
+  one-off, not a rerun of a stable suite — and that's why this file is new
+  even though the facet engine itself is older. Plain Node + `vm` with a stub
+  DOM (no Playwright, no install step), ~0.15s, 165 assertions: empty- and
+  real-catalogue rendering with no undefined/null/NaN/[object Object];
+  six-line structure and per-line velvet; a throwaway 7th line propagating to
+  trays/drawer/footer/sidebar; governance thresholds, deep-linked
+  sub-threshold chips and full-catalogue counting; subtype scoping and
+  orphan pruning; multi-category matching/display and the load-time
+  `console.warn` guardrail; art() coverage for all 15 types plus the generic
+  fallback; no hardcoded facet keys in the facet-loop functions, plus a
+  throwaway 10th facet working from one `FACETS` entry; colour swatches
+  (hex dot vs `multi` conic-gradient). Passes against the current
+  `index.html` (post-masthead change) and was confirmed to fail under
+  deliberate mutations. Deliberate exception: `liveTypeEntries()` (homepage pills and
+  drawer "Shop by type") looks up the `"type"` facet by key literal on
+  purpose — a type-specific browsing feature, not a generic facet-engine
+  function — and carries a comment saying so; it isn't asserted facet-driven.
+
+- **Masthead height cut ~40%, with a 44px burger tap target kept**.
+  Measured in real Chromium first: 67px mobile / 85px desktop (incl. the
+  1px border-bottom). Now 43px mobile / 51px desktop (64% / 60%). Desktop:
+  `.mast-in` 84→50px and the Enquire button's padding/min-height shrunk
+  (`.mast-cta{padding:8px 22px;min-height:36px}`); type unchanged. Mobile:
+  `.mast-in` 66→42px, wordmark scaled together (`.small` 9→8px, `.big`
+  23→20px, gap 4→3px; 8px is the legibility floor). The burger is 44px tall
+  (it briefly went to 36px, below a comfortable touch size) and overhangs
+  the 42px bar by 1px top/bottom via `margin:-1px`, so the glyph stays small
+  and the bar stays thin; mobile ended 3px taller than the exact 40px/60%
+  target to protect that. Dependent values moved with it: `#app{padding-top}`
+  67→43px (mobile) / 85→51px (desktop), and `TOP_ZONE` 80→51 (one value for
+  both breakpoints; on mobile it sits 8px below the bar's height, harmless).
+  Verified: first content sits exactly at the masthead's bottom edge on all 7
+  routes at 390 and 1280px; hide-on-scroll behaves; `check-wrap-padding.mjs`
+  passes 180/180.
+
 - **Fixed broken `position:sticky` on both the masthead and the mobile PDP
   buy bar; added hide-on-scroll to the masthead** (commits `4bbbeb4`,
   `66777b9`). Both elements' `position:sticky` was silently non-functional
@@ -83,8 +124,14 @@ Most recent first.
     breakpoint are unaffected; the mobile drawer opens above the header
     with no z-index conflicts; the masthead's hide/show doesn't perturb
     the page's total scroll height or the buy bar's independent pinning.
-  - `check-wrap-padding.mjs` and the facet-engine suite both re-run clean
-    against the final state — this work touched neither.
+  - `check-wrap-padding.mjs` re-runs clean against the final state — this
+    work didn't touch it. (This line used to also claim "the facet-engine
+    suite" re-ran clean. **No such file exists in this repo or its git
+    history, or in `../intake-station`** — the facet-engine checks were
+    ad-hoc vm/jsdom scripts run during the taxonomy work and never committed,
+    so there is nothing to re-run by filename. The only committed standing
+    check was `check-wrap-padding.mjs` — **resolved: `check-facet-engine.mjs`
+    now exists, see the newest entry above.**)
 - **`docs/nazaakat-taxonomy-spec.md` is now committed, not a temporary
   chat artifact** (commit `6fb6c8e`). Every prompt before this one treated
   the spec as something to read and delete; it's the shared source of
@@ -274,6 +321,15 @@ check-wrap-padding.mjs  headless-Chromium check that every `.wrap`-bearing
                      runtime. Run after any prompt that touches <style> or
                      a page-render function — see Changes for why a
                      vm/jsdom check can't catch this class of bug.
+check-facet-engine.mjs  plain-Node (vm + stub DOM, no browser, no install step,
+                     ~0.15s) structural check of the facet engine: FACETS
+                     governance thresholds, six-line structure, subtype
+                     scoping, multi-category matching, art() type coverage,
+                     facet-driven (no hardcoded keys) render functions, colour
+                     swatches. Loads index.html's inline script + products.js.
+                     Run after any change to products.js, FACETS, the
+                     vocabularies, art(), or a render function that consumes
+                     them. Not a layout check — that's check-wrap-padding.mjs.
 package.json         dev/QA tooling only (currently just `playwright`, for
                      check-wrap-padding.mjs, with a `postinstall` hook that
                      fetches its Chromium binary) — index.html loads
